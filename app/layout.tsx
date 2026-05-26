@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hackathon Starter — Subconscious Agents",
+  title: "FitCheck Chatbot — Dimension Shopping Agent",
   description:
-    "Chat and long-running agents powered by Subconscious, Vercel AI SDK, Baseten, and Cloudflare.",
+    "A conversational Wayfair shopping assistant that uses Subconscious visual reasoning and dimensions to recommend products that fit.",
 };
 
 export default function RootLayout({

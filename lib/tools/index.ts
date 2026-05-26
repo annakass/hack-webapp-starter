@@ -1,5 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { rankProductsForScene } from "@/lib/fitcheck-agent";
+import { roomScenes } from "@/lib/fitcheck-data";
 
 /**
  * Example tools for the hackathon starter.
@@ -97,9 +99,60 @@ export const runLongTask = tool({
   },
 });
 
+export const findFittingProducts = tool({
+  description:
+    "Detect the target room surface and rank Wayfair-style products by fit confidence, dimensions, and shopper constraints.",
+  inputSchema: z.object({
+    query: z
+      .string()
+      .describe(
+        'User shopping request, e.g. "find me a plant that fits on this table"',
+      ),
+    sceneId: z
+      .string()
+      .optional()
+      .describe("Detected room scene id. Defaults to the bundled test room."),
+  }),
+  execute: async ({ query, sceneId }) => {
+    const scene =
+      roomScenes.find((candidate) => candidate.id === sceneId) ?? roomScenes[0];
+    const result = rankProductsForScene(scene, query);
+
+    return {
+      query,
+      surfaceDetection: {
+        sceneId: result.surfaceDetection.sceneId,
+        surfaceName: result.surfaceDetection.surfaceName,
+        confidence: result.surfaceDetection.confidence,
+        confidenceLabel: result.surfaceDetection.confidenceLabel,
+        dimensions: scene.surfaceDimensions,
+        constraints: scene.constraints,
+        evidence: result.surfaceDetection.evidence,
+      },
+      rankedProducts: result.rankedProducts.map((productFit) => ({
+        id: productFit.product.id,
+        name: productFit.product.name,
+        verdict: productFit.verdict,
+        fitConfidence: productFit.score,
+        score: productFit.score,
+        dimensions: productFit.product.dimensions,
+        productUrl: productFit.product.productUrl,
+        reasons: productFit.reasons,
+      })),
+      generatedVisualFitReasoning: {
+        provider: result.visualPlan.provider,
+        prompt: result.visualPlan.prompt,
+        status: result.visualPlan.status,
+        highlights: result.visualReasoning,
+      },
+    };
+  },
+});
+
 export const chatTools = {
   getWeather,
   calculate,
+  findFittingProducts,
 };
 
 export const agentTools = {
@@ -107,4 +160,5 @@ export const agentTools = {
   calculate,
   webSearch,
   runLongTask,
+  findFittingProducts,
 };
