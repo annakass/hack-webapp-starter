@@ -1,0 +1,11 @@
+services:
+  langgraph-service:
+    build:
+      context: .
+      dockerfile: ./langgraph-service/dockerfile
+      target: runtime
+    environment:
+      PORT: "5000"
+      SUBCONSCIOUS_API_KEY: ${SUBCONSCIOUS_API_KEY:-}
+    ports:
+      - "5001:5000"
