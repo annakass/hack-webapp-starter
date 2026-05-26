@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FitCheck — Dimension Shopping Agent",
+  title: "FitCheck Chatbot — Dimension Shopping Agent",
   description:
-    "A Wayfair shopping agent that uses Subconscious visual reasoning and dimensions to recommend products that fit.",
+    "A conversational Wayfair shopping assistant that uses Subconscious visual reasoning and dimensions to recommend products that fit.",
 };
 
 export default function RootLayout({

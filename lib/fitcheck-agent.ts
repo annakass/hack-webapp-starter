@@ -22,9 +22,18 @@ export interface VisualGenerationPlan {
   status: string;
 }
 
+export interface SurfaceDetection {
+  sceneId: string;
+  surfaceName: string;
+  confidence: number;
+  confidenceLabel: "high" | "medium" | "low";
+  evidence: string[];
+}
+
 export interface FitcheckResult {
   scene: RoomScene;
   query: string;
+  surfaceDetection: SurfaceDetection;
   tableSafeZone: {
     width: number;
     depth: number;
@@ -32,10 +41,25 @@ export interface FitcheckResult {
   };
   rankedProducts: ProductFitResult[];
   visualPlan: VisualGenerationPlan;
+  visualReasoning: string[];
 }
 
 const MIN_TABLE_CLEARANCE = 6;
 const MAX_TABLETOP_HEIGHT = 24;
+
+const getConfidenceLabel = (
+  confidence: number,
+): SurfaceDetection["confidenceLabel"] => {
+  if (confidence >= 0.85) {
+    return "high";
+  }
+
+  if (confidence >= 0.65) {
+    return "medium";
+  }
+
+  return "low";
+};
 
 const getVerdict = (
   tableClearance: number,
@@ -98,9 +122,25 @@ export const rankProductsForScene = (
     })
     .sort((left, right) => right.score - left.score);
 
+  const surfaceDetection: SurfaceDetection = {
+    sceneId: scene.id,
+    surfaceName: scene.surfaceName,
+    confidence: scene.detection.confidence,
+    confidenceLabel: getConfidenceLabel(scene.detection.confidence),
+    evidence: scene.detection.evidence,
+  };
+
+  const bestMatch = rankedProducts[0];
+  const visualReasoning = [
+    `${scene.surfaceName} detected at ${(surfaceDetection.confidence * 100).toFixed(0)}% confidence using the uploaded room context.`,
+    `${bestMatch?.product.name ?? "Top recommendation"} leaves ${Math.max(0, bestMatch?.tableClearance ?? 0).toFixed(0)} inches of tabletop clearance in the safe zone.`,
+    `${Math.max(0, bestMatch?.heightBuffer ?? 0)} inches of height buffer keeps the recommendation under the sightline limit.`,
+  ];
+
   return {
     scene,
     query,
+    surfaceDetection,
     tableSafeZone,
     rankedProducts,
     visualPlan: {
@@ -116,6 +156,7 @@ export const rankProductsForScene = (
       status:
         "Subconscious handles visual reasoning from the uploaded image; the demo renders the generated layout locally so it works without an image-generation endpoint.",
     },
+    visualReasoning,
   };
 };
 

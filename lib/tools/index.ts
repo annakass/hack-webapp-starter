@@ -101,7 +101,7 @@ export const runLongTask = tool({
 
 export const findFittingProducts = tool({
   description:
-    "Rank Wayfair-style products by whether their dimensions fit the detected surface in the user's room image.",
+    "Detect the target room surface and rank Wayfair-style products by fit confidence, dimensions, and shopper constraints.",
   inputSchema: z.object({
     query: z
       .string()
@@ -120,22 +120,31 @@ export const findFittingProducts = tool({
 
     return {
       query,
-      detectedSurface: {
-        name: scene.surfaceName,
+      surfaceDetection: {
+        sceneId: result.surfaceDetection.sceneId,
+        surfaceName: result.surfaceDetection.surfaceName,
+        confidence: result.surfaceDetection.confidence,
+        confidenceLabel: result.surfaceDetection.confidenceLabel,
         dimensions: scene.surfaceDimensions,
         constraints: scene.constraints,
+        evidence: result.surfaceDetection.evidence,
       },
-      topMatches: result.rankedProducts.map((productFit) => ({
+      rankedProducts: result.rankedProducts.map((productFit) => ({
         id: productFit.product.id,
         name: productFit.product.name,
         verdict: productFit.verdict,
+        fitConfidence: productFit.score,
         score: productFit.score,
         dimensions: productFit.product.dimensions,
         productUrl: productFit.product.productUrl,
-        reasons: productFit.reasons.slice(0, 3),
+        reasons: productFit.reasons,
       })),
-      visualGenerationPrompt: result.visualPlan.prompt,
-      provider: result.visualPlan.provider,
+      generatedVisualFitReasoning: {
+        provider: result.visualPlan.provider,
+        prompt: result.visualPlan.prompt,
+        status: result.visualPlan.status,
+        highlights: result.visualReasoning,
+      },
     };
   },
 });

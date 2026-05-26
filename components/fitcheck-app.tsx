@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { defaultFitcheckResult, rankProductsForScene } from "@/lib/fitcheck-agent";
 import { roomScenes } from "@/lib/fitcheck-data";
@@ -65,6 +66,14 @@ export function FitcheckApp() {
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#FF5C28]">
               Wayfair · Subconscious · Beat The Clock
             </p>
+            <div className="mt-3">
+              <Link
+                href="/"
+                className="inline-flex rounded-full border border-zinc-700 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300 transition hover:border-[#FF5C28] hover:text-[#FF5C28]"
+              >
+                Back to chatbot
+              </Link>
+            </div>
             <h1 className="mt-4 text-5xl font-black tracking-tight md:text-7xl">
               FitCheck
             </h1>

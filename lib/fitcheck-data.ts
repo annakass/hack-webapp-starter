@@ -16,6 +16,11 @@ export interface RoomScene {
     depth: number;
   };
   constraints: string[];
+  detection: {
+    confidence: number;
+    method: string;
+    evidence: string[];
+  };
 }
 
 export interface ShoppingProduct {
@@ -52,6 +57,15 @@ export const roomScenes: RoomScene[] = [
       "Keep plant under 24 inches tall so it does not block the TV.",
       "Prefer low-maintenance plants for a living room.",
     ],
+    detection: {
+      confidence: 0.94,
+      method: "Subconscious visual pass + dimensions sanity check",
+      evidence: [
+        "Round tabletop edge and centered placement are visible in the uploaded room image.",
+        "Scene depth and table diameter are consistent with a 34 inch coffee table.",
+        "Prompt mentions a table near the TV sightline constraint.",
+      ],
+    },
   },
 ];
 

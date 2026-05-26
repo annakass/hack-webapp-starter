@@ -1,14 +1,14 @@
 # FitCheck: Dimension-First Shopping Agent
 
 FitCheck is a Wayfair customer-track hack built on this Subconscious starter.
-The demo flow is: upload or use a room image, ask for a product like “find me a
-plant that will fit on this table,” then scroll ranked Wayfair product matches
-while a generated 3D-style visual shows how the selected product fits.
+The demo flow is now chatbot-first: upload a room image in chat, ask for a
+product like “find me a plant that will fit on this table,” and receive ranked
+Wayfair matches with fit confidence, links, and generated visual-fit reasoning.
 
 The app uses `subconscious/tim-qwen3.6-27b` through `lib/subconscious.ts`.
 Subconscious handles the vision/reasoning story from a user-provided image; the
-demo renders the visual layout locally from dimensions so it remains reliable
-without a separate image-generation endpoint.
+demo keeps dimension-driven ranking and local visual-fit planning so results stay
+reliable without a separate image-generation endpoint.
 
 ## Demo Path
 
@@ -20,17 +20,18 @@ pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000). The bundled test image is
-`public/test-room.svg`.
+`public/test-room.svg`. Optional standalone visual demo: `/fitcheck-demo`.
 
 60-second script:
 
-1. “A shopper uploads a living room photo and asks for a plant that fits on this
-   table.”
-2. FitCheck detects a 34 inch round coffee table and applies clearance and
+1. “A shopper uploads a living room photo and asks in chat: find me a plant that
+   fits on this table.”
+2. FitCheck detects the table surface with confidence and applies clearance plus
    sightline constraints.
-3. It ranks plant products by exact dimensions and links Wayfair searches.
-4. Selecting each product updates the generated 3D fit visual.
-5. The outcome is a confident purchase decision instead of dimension anxiety.
+3. Chat returns ranked products with fit confidence, dimensions, and Wayfair
+   links.
+4. Chat also explains generated visual-fit reasoning (clearance + line of sight).
+5. Optional: open `/fitcheck-demo` to show the standalone visualized layout.
 
 ---
 
@@ -106,12 +107,13 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-**4. Try the two modes**
+**4. Run the chatbot-first flow**
 
-- **Chat** — fast Q&A with demo tools (good for prototyping UX)
-- **Agent** — multi-step runs with search, long tasks, and MCP stubs (good for track demos)
-
-Use **Image** to attach a photo (e.g. a photo of a room or box).
+- Open `/` for the conversational FitCheck chatbot experience.
+- Use **Image** to attach a room photo and ask a fit question.
+- The assistant calls fitcheck tools to return confidence, ranked products, and
+  Wayfair links.
+- Optional: open `/fitcheck-demo` for the standalone visual component.
 
 ---
 
@@ -167,7 +169,8 @@ The UI sends images as data URLs. Useful for room photos, screenshots, or docs. 
 - **Chat + research agents** — `lib/agents/index.ts`
 - **Example tools** — weather, calculator, web search stub, long task
 - **Streaming API** — `app/api/chat/route.ts`
-- **Chat UI** — `components/chat-app.tsx`
+- **Chatbot UI** — `components/chat-app.tsx`
+- **Standalone demo view** — `components/fitcheck-app.tsx` via `/fitcheck-demo`
 - **Subconscious API skill** — `.agents/skills/subconscious-dev/` (for Cursor/Codex)
 
 Re-install the skill anytime:

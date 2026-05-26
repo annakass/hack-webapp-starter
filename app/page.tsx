@@ -1,5 +1,5 @@
-import { FitcheckApp } from "@/components/fitcheck-app";
+import { ChatApp } from "@/components/chat-app";
 
 export default function Home() {
-  return <FitcheckApp />;
+  return <ChatApp />;
 }
