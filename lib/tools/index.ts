@@ -1,5 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { rankProductsForScene } from "@/lib/fitcheck-agent";
+import { roomScenes } from "@/lib/fitcheck-data";
 
 /**
  * Example tools for the hackathon starter.
@@ -97,9 +99,51 @@ export const runLongTask = tool({
   },
 });
 
+export const findFittingProducts = tool({
+  description:
+    "Rank Wayfair-style products by whether their dimensions fit the detected surface in the user's room image.",
+  inputSchema: z.object({
+    query: z
+      .string()
+      .describe(
+        'User shopping request, e.g. "find me a plant that fits on this table"',
+      ),
+    sceneId: z
+      .string()
+      .optional()
+      .describe("Detected room scene id. Defaults to the bundled test room."),
+  }),
+  execute: async ({ query, sceneId }) => {
+    const scene =
+      roomScenes.find((candidate) => candidate.id === sceneId) ?? roomScenes[0];
+    const result = rankProductsForScene(scene, query);
+
+    return {
+      query,
+      detectedSurface: {
+        name: scene.surfaceName,
+        dimensions: scene.surfaceDimensions,
+        constraints: scene.constraints,
+      },
+      topMatches: result.rankedProducts.map((productFit) => ({
+        id: productFit.product.id,
+        name: productFit.product.name,
+        verdict: productFit.verdict,
+        score: productFit.score,
+        dimensions: productFit.product.dimensions,
+        productUrl: productFit.product.productUrl,
+        reasons: productFit.reasons.slice(0, 3),
+      })),
+      visualGenerationPrompt: result.visualPlan.prompt,
+      provider: result.visualPlan.provider,
+    };
+  },
+});
+
 export const chatTools = {
   getWeather,
   calculate,
+  findFittingProducts,
 };
 
 export const agentTools = {
@@ -107,4 +151,5 @@ export const agentTools = {
   calculate,
   webSearch,
   runLongTask,
+  findFittingProducts,
 };

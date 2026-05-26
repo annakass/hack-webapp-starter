@@ -1,3 +1,39 @@
+# FitCheck: Dimension-First Shopping Agent
+
+FitCheck is a Wayfair customer-track hack built on this Subconscious starter.
+The demo flow is: upload or use a room image, ask for a product like “find me a
+plant that will fit on this table,” then scroll ranked Wayfair product matches
+while a generated 3D-style visual shows how the selected product fits.
+
+The app uses `subconscious/tim-qwen3.6-27b` through `lib/subconscious.ts`.
+Subconscious handles the vision/reasoning story from a user-provided image; the
+demo renders the visual layout locally from dimensions so it remains reliable
+without a separate image-generation endpoint.
+
+## Demo Path
+
+```bash
+pnpm install
+cp .env.example .env.local
+# Set SUBCONSCIOUS_API_KEY in .env.local for live chat/tool calls
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). The bundled test image is
+`public/test-room.svg`.
+
+60-second script:
+
+1. “A shopper uploads a living room photo and asks for a plant that fits on this
+   table.”
+2. FitCheck detects a 34 inch round coffee table and applies clearance and
+   sightline constraints.
+3. It ranks plant products by exact dimensions and links Wayfair searches.
+4. Selecting each product updates the generated 3D fit visual.
+5. The outcome is a confident purchase decision instead of dimension anxiety.
+
+---
+
 # Wayfair × Subconscious Hackathon Starter
 
 Build AI agents on **Subconscious** (TIM-Qwen3.6) with the **Vercel AI SDK**. This repo gives you a working chat UI, long-running agent mode, example tools, and an MCP template — so you can focus on your track, not boilerplate.
